@@ -29,8 +29,10 @@ let aops = {
 		request(`${url}/stats.json`, (error, response, body) => {
 			let stats = JSON.parse(body);
 			let correct = stats[`${problem}`][stats[`${problem}`]["Answer"]];
-			let reply = `**${correct}% of participants correctly answered this problem.**`;
-			message.channel.send(reply);
+			let statsInfo = `**${correct}% of participants correctly answered this problem.**`;
+			let solution = `*View solution:* <${url}/Sol_${problem}.png>`;
+			message.channel.send(statsInfo);
+			message.channel.send(solution);
 		});
 	},
 
