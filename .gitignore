@@ -1,0 +1,5 @@
+# installation dependencies
+node_modules/
+
+# private configuration
+config.json

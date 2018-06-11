@@ -1,0 +1,21 @@
+{
+  "name": "aops-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "aops-bot.js",
+  "engines": {
+    "node": "9.4.0",
+    "npm": "5.6.0"
+  },
+  "scripts": {
+    "start": "node aops-bot.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^11.3.2",
+    "request": "^2.87.0"
+  }
+}
