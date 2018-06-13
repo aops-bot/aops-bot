@@ -1,4 +1,4 @@
-const {prefix, token} = require('./config.json');
+const { prefix, token } = require('./config.json');
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const request = require('request');
@@ -6,33 +6,39 @@ const request = require('request');
 let aops = {
 
 	base_url: 'https://raw.githubusercontent.com/aops-bot',
+	sol_url: 'https://artofproblemsolving.com/wiki/index.php?title=',
 
-	amc_12: {
-		name: 'AMC_12',
-		version: ['A','B'],
-		year: { min: 2011, max: 2018 }, // years with stats
-		problem: { min: 1, max: 25 }
+	// read external config - problem updates require service worker restart
+	init() {
+		request(`${aops.base_url}/AMC_12/master/config.json`, (error, response, body) => {
+			aops.config = JSON.parse(body);
+			console.log('Ready >>');
+		});
 	},
 
 	getProblem(message) {
-		let test = aops.amc_12.name;
-		let year = 2011; // getRandom(aops.amc_12.year.min, aops.amc_12.year.max); // 2011-2018
-		let version = 'A'; // aops.amc_12.version[getRandom(0, aops.amc_12.version.length - 1)]; // A-B
-		let problem = getRandom(aops.amc_12.problem.min, aops.amc_12.problem.max); // 1-25
+		let test = aops.config.name;
+		let year = getRandom(aops.config.year.min, aops.config.year.max); // 2011-2018
+		let version = aops.config.version[getRandom(0, aops.config.version.length - 1)]; // A-B
+		let problem = getRandom(aops.config.problem.min, aops.config.problem.max); // 1-25
 		let url = `${aops.base_url}/${test}/${version}/${year}`;
 		
 		aops.fetchStats(url, problem, message);
 		message.channel.send(`${url}/Prob_${problem}.png`);
+
+		let solution = 
+		`*View solution:*\n<${aops.sol_url}${year}_${test}${version}_Problems/Problem_${problem}>`;
+		message.channel.send(solution);
 	},
 
+	// get stats for the problem
 	fetchStats(url, problem, message) {
 		request(`${url}/stats.json`, (error, response, body) => {
 			let stats = JSON.parse(body);
 			let correct = stats[`${problem}`][stats[`${problem}`]["Answer"]];
 			let statsInfo = `**${correct}% of participants correctly answered this problem.**`;
-			let solution = `*View solution:* <${url}/Sol_${problem}.png>`;
+			
 			message.channel.send(statsInfo);
-			message.channel.send(solution);
 		});
 	},
 
@@ -45,10 +51,10 @@ let aops = {
 
 };
 
-// utility methods
-let getRandom = (min, max) => Math.floor((Math.random() * (max - min)) + min);
+// generate random integer between min & max inclusive
+let getRandom = (min, max) => Math.floor((Math.random() * (max - min + 1)) + min);
 
 // client config
-client.on('ready', () => console.log('Ready >>'));
+client.on('ready', () => aops.init());
 client.on('message', async message => aops.respond(message));
 client.login(token);
